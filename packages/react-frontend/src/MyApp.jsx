@@ -1,25 +1,25 @@
 import Table from "./Table";
 import Form from "./Form";
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 
 function MyApp() {
   const [characters, setCharacters] = useState([
     {
       name: "Charlie",
-      job: "Janitor"
+      job: "Janitor",
     },
     {
       name: "Mac",
-      job: "Bouncer"
+      job: "Bouncer",
     },
     {
       name: "Dee",
-      job: "Aspring actress"
+      job: "Aspring actress",
     },
     {
       name: "Dennis",
-      job: "Bartender"
-    }
+      job: "Bartender",
+    },
   ]);
 
   function removeOneCharacter(index) {
@@ -29,13 +29,12 @@ function MyApp() {
     setCharacters(updated);
   }
 
-  function updateList(person) { 
+  function updateList(person) {
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
-      .catch((error) => {
-        console.log(error);
-      })
-}
+      .then((res) => res.json())
+      .then((json) => setCharacters(characters.concat(json)))
+      .catch((error) => console.log(error));
+  }
 
   function fetchUsers() {
     const promise = fetch("http://localhost:8000/users");
@@ -63,19 +62,13 @@ function MyApp() {
 
     return promise;
   }
-  
+
   return (
     <div className="container">
-      <Table
-        characterData={characters}
-        removeCharacter={removeOneCharacter}
-      />
+      <Table characterData={characters} removeCharacter={removeOneCharacter} />
       <Form handleSubmit={updateList} />
     </div>
   );
 }
 
-export default MyApp; 
-
-
-
+export default MyApp;
