@@ -8,6 +8,8 @@ const port = 8000;
 app.use(cors());
 app.use(express.json());
 
+const generateRandomIDNumber = () => Math.floor(Math.random()*69420);
+
 
 const users = {
     users_list : [
