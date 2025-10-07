@@ -57,9 +57,14 @@ app.get("/users/:id", (req, res) => {
 // POST new user
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  userToAdd.id = generateRandomID(); // <-- Use new ID generator
-  users.users_list.push(userToAdd);
-  res.status(201).send(userToAdd); // send the created user
+  const newUser = {
+    id: generateRandomID(), // put id first
+    name: userToAdd.name,
+    job: userToAdd.job,
+  };
+
+  users.users_list.push(newUser);
+  res.status(201).send(newUser);
 });
 
 // DELETE user by ID
