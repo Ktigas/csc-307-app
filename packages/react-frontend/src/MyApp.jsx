@@ -1,6 +1,7 @@
 import Table from "./Table";
 import Form from "./Form";
 import React, { useState, useEffect } from "react";
+import axios from "axios"
 
 function MyApp() {
   const [characters, setCharacters] = useState([
@@ -22,12 +23,30 @@ function MyApp() {
     },
   ]);
 
+  /*
   function removeOneCharacter(index) {
     const updated = characters.filter((character, i) => {
       return i !== index;
     });
     setCharacters(updated);
+  } */
+
+  function removeOneCharacter(id) {
+    axios
+      .delete(`http://localhost:8000/users/${id}`)
+      .then((response) => {
+        if (response.status === 204) {
+          console.log(`User with ID ${id} deleted successfully`);
+          setCharacters(characters.filter((character) => character.id !== id));
+        } else {
+          console.log("Delete request did not return 204:", response.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error deleting user:", error);
+      });
   }
+    
 
   function updateList(person) {
     postUser(person)
