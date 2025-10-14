@@ -1,85 +1,47 @@
 import Table from "./Table";
 import Form from "./Form";
 import React, { useState, useEffect } from "react";
-import axios from "axios"
+import axios from "axios";
 
 function MyApp() {
-  const [characters, setCharacters] = useState([
-    {
-      name: "Charlie",
-      job: "Janitor",
-    },
-    {
-      name: "Mac",
-      job: "Bouncer",
-    },
-    {
-      name: "Dee",
-      job: "Aspring actress",
-    },
-    {
-      name: "Dennis",
-      job: "Bartender",
-    },
-  ]);
+  const [characters, setCharacters] = useState([]);
 
-  /*
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
-  } */
+  // Fetch users from backend
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/users")
+      .then((res) => {
+        console.log("Fetched from backend:", res.data.users_list);
+        setCharacters(res.data.users_list); // each user already has `id` mapped
+      })
+      .catch((error) => console.error("Error fetching users:", error));
+  }, []);
 
+  // Delete a user
   function removeOneCharacter(id) {
     axios
       .delete(`http://localhost:8000/users/${id}`)
       .then((response) => {
-        if (response.status === 204) {
+        // Our backend now returns 200 with a message
+        if (response.status === 200) {
           console.log(`User with ID ${id} deleted successfully`);
           setCharacters(characters.filter((character) => character.id !== id));
         } else {
-          console.log("Delete request did not return 204:", response.status);
+          console.log("Delete request returned:", response.status);
         }
       })
-      .catch((error) => {
-        console.error("Error deleting user:", error);
-      });
+      .catch((error) => console.error("Error deleting user:", error));
   }
-    
 
+  // Add a new user
   function updateList(person) {
-    postUser(person)
-      .then((res) => res.json())
-      .then((json) => setCharacters(characters.concat(json)))
-      .catch((error) => console.log(error));
-  }
-
-  function fetchUsers() {
-    const promise = fetch("http://localhost:8000/users");
-    return promise;
-  }
-
-  useEffect(() => {
-    fetchUsers()
-      .then((res) => res.json())
-      .then((json) => {
-        console.log("Fetched from backend:", json["users_list"]);
-        setCharacters(json["users_list"]);
+    axios
+      .post("http://localhost:8000/users", person)
+      .then((res) => {
+        const newUser = res.data; // backend returns user with `id` field
+        setCharacters((prev) => [...prev, newUser]);
       })
-      .catch((error) => console.log(error));
-  }, []);
-
-  function postUser(person) {
-    const promise = fetch("http://localhost:8000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(person),
-    });
-
-    return promise;
+      .catch((error) => console.error("Error adding user:", error));
   }
 
   return (
